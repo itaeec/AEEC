@@ -674,6 +674,10 @@
   @keyframes navDrop{ from{ opacity:0; transform: translateY(-10px) scaleY(.97); } to{ opacity:1; transform:none; } }
   @keyframes navItem{ from{ opacity:0; transform: translateY(-8px); } to{ opacity:1; transform:none; } }
   @media (prefers-reduced-motion: reduce){ .burger{transition:none} nav.main.open, nav.main.open > *{ animation:none } }
+  /* only one dropdown at a time: a clicked (focused) menu gives way to the one under the mouse */
+  @media (min-width: 1081px) and (hover: hover) {
+    nav.main:hover .dd:focus-within:not(:hover) .menu { display: none; }
+  }
 </style>
 <style>
   /* ---- articles: shared ---- */
@@ -786,6 +790,17 @@
     </nav>
   </div>
 </header>
+<script>
+/* mouse users: a clicked dropdown closes once the pointer leaves it (keyboard focus still works) */
+(function () {
+  var fine = window.matchMedia('(hover: hover) and (min-width: 1081px)');
+  document.querySelectorAll('nav.main .dd').forEach(function (dd) {
+    dd.addEventListener('mouseleave', function () {
+      if (fine.matches && dd.contains(document.activeElement)) document.activeElement.blur();
+    });
+  });
+})();
+</script>
 
 <section class="ahero">
   <div class="inner">

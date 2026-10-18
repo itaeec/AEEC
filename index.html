@@ -713,6 +713,10 @@
   .tq figcaption small { display: block; font-weight: 600; font-size: .78rem; color: var(--ink-dim); }
   .tq-av { flex: 0 0 40px; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-family: var(--round); font-weight: 800; font-size: 1.05rem; }
   @media (prefers-reduced-motion: reduce) { .quotes .tq { transform: none; } }
+  /* only one dropdown at a time: a clicked (focused) menu gives way to the one under the mouse */
+  @media (min-width: 1081px) and (hover: hover) {
+    nav.main:hover .dd:focus-within:not(:hover) .menu { display: none; }
+  }
 </style>
 
 <!-- ================= HEADER ================= -->
@@ -757,6 +761,17 @@
     </nav>
   </div>
 </header>
+<script>
+/* mouse users: a clicked dropdown closes once the pointer leaves it (keyboard focus still works) */
+(function () {
+  var fine = window.matchMedia('(hover: hover) and (min-width: 1081px)');
+  document.querySelectorAll('nav.main .dd').forEach(function (dd) {
+    dd.addEventListener('mouseleave', function () {
+      if (fine.matches && dd.contains(document.activeElement)) document.activeElement.blur();
+    });
+  });
+})();
+</script>
 
 <!-- ================= SCROLL-EXPANSION OPENER ================= -->
 <div class="expander" id="top">

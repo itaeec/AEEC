@@ -676,6 +676,10 @@
   @keyframes navDrop{ from{ opacity:0; transform: translateY(-10px) scaleY(.97); } to{ opacity:1; transform:none; } }
   @keyframes navItem{ from{ opacity:0; transform: translateY(-8px); } to{ opacity:1; transform:none; } }
   @media (prefers-reduced-motion: reduce){ .burger{transition:none} nav.main.open, nav.main.open > *{ animation:none } }
+  /* only one dropdown at a time: a clicked (focused) menu gives way to the one under the mouse */
+  @media (min-width: 1081px) and (hover: hover) {
+    nav.main:hover .dd:focus-within:not(:hover) .menu { display: none; }
+  }
 </style>
 <style>
   /* ---- gallery page additions ---- */
@@ -764,6 +768,17 @@
     </nav>
   </div>
 </header>
+<script>
+/* mouse users: a clicked dropdown closes once the pointer leaves it (keyboard focus still works) */
+(function () {
+  var fine = window.matchMedia('(hover: hover) and (min-width: 1081px)');
+  document.querySelectorAll('nav.main .dd').forEach(function (dd) {
+    dd.addEventListener('mouseleave', function () {
+      if (fine.matches && dd.contains(document.activeElement)) document.activeElement.blur();
+    });
+  });
+})();
+</script>
 
 <section class="ghero">
   <div class="sunburst" aria-hidden="true"><svg viewBox="0 0 100 100"><g class="rays" stroke="#E8A33C" stroke-width="4" stroke-linecap="round"><path d="M50 4v12M50 84v12M4 50h12M84 50h12M17 17l8.5 8.5M74.5 74.5l8.5 8.5M83 17l-8.5 8.5M25.5 74.5L17 83"/></g><circle cx="50" cy="50" r="21" fill="#FFD980" stroke="#E8A33C" stroke-width="3"/><g stroke="#8a6414" stroke-width="2.6" stroke-linecap="round" fill="none"><path d="M43 47c1.5-2 4-2 5 0M52 47c1.5-2 4-2 5 0M44 56c3.5 3.5 8.5 3.5 12 0"/></g></svg></div>

@@ -1,0 +1,10 @@
+# Netlify settings for the AEEC site (plain static files, no build step)
+[build]
+  publish = "."
+  command = ""
+
+# Photos and brand images rarely change: let browsers cache them for a week
+[[headers]]
+  for = "/img/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

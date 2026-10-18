@@ -700,6 +700,19 @@
   @keyframes navDrop{ from{ opacity:0; transform: translateY(-10px) scaleY(.97); } to{ opacity:1; transform:none; } }
   @keyframes navItem{ from{ opacity:0; transform: translateY(-8px); } to{ opacity:1; transform:none; } }
   @media (prefers-reduced-motion: reduce){ .burger{transition:none} nav.main.open, nav.main.open > *{ animation:none } }
+  /* ---- testimonials ---- */
+  .quotes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 40px; align-items: start; }
+  @media (max-width: 900px) { .quotes { grid-template-columns: 1fr; } }
+  .quotes.all { display: block; columns: 3 290px; column-gap: 24px; margin-top: 10px; }
+  .quotes.all .tq { break-inside: avoid; margin: 0 0 40px; display: inline-block; width: 100%; }
+  .tq { margin: 0; background: var(--card); border: 2px dashed var(--line); border-radius: 18px; padding: 34px 26px 22px; box-shadow: var(--shadow); position: relative; }
+  .quotes .tq:nth-child(odd) { transform: rotate(-.5deg); } .quotes .tq:nth-child(even) { transform: rotate(.5deg); }
+  .tq::before { content: "\201C"; position: absolute; top: -30px; left: 16px; font-family: Georgia, "Times New Roman", serif; font-size: 5.4rem; line-height: 1; color: var(--gold-deep); }
+  .tq blockquote { margin: 0; font-size: .98rem; line-height: 1.68; color: var(--ink); }
+  .tq figcaption { display: flex; align-items: center; gap: 11px; margin-top: 18px; font-family: var(--round); font-weight: 700; color: var(--ink); }
+  .tq figcaption small { display: block; font-weight: 600; font-size: .78rem; color: var(--ink-dim); }
+  .tq-av { flex: 0 0 40px; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-family: var(--round); font-weight: 800; font-size: 1.05rem; }
+  @media (prefers-reduced-motion: reduce) { .quotes .tq { transform: none; } }
 </style>
 
 <!-- ================= HEADER ================= -->
@@ -724,6 +737,7 @@
           <a href="#about">About us</a>
           <a href="#rooms">Our rooms</a>
           <a href="#kitchen">Our kitchen</a>
+          <a href="testimonials/">What families say</a>
         </div>
       </div>
       <div class="dd">
@@ -1216,6 +1230,19 @@
   </div>
 </section>
 
+<!-- ================= TESTIMONIALS ================= -->
+<svg class="wave " viewBox="0 0 1440 44" preserveAspectRatio="none" aria-hidden="true" style="background:var(--bg)"><path class="rip" d="M0,10.6 L52,9.0 L82,8.4 L125,20.0 L185,10.4 L214,14.3 L271,13.2 L335,10.1 L388,8.4 L430,19.1 L475,15.3 L533,21.4 L585,18.6 L629,8.6 L661,13.2 L713,8.7 L744,12.4 L777,15.0 L838,21.4 L875,16.7 L937,22.1 L996,18.2 L1033,22.1 L1090,18.7 L1146,11.6 L1196,20.7 L1251,9.2 L1285,15.5 L1333,18.2 L1392,15.1 L1432,11.9 L1440,15 L1440,44 L0,44 Z"/><path d="M0,19.6 L52,18.0 L82,17.4 L125,29.0 L185,19.4 L214,23.3 L271,22.2 L335,19.1 L388,17.4 L430,28.1 L475,24.3 L533,30.4 L585,27.6 L629,17.6 L661,22.2 L713,17.7 L744,21.4 L777,24.0 L838,30.4 L875,25.7 L937,31.1 L996,27.2 L1033,31.1 L1090,27.7 L1146,20.6 L1196,29.7 L1251,18.2 L1285,24.5 L1333,27.2 L1392,24.1 L1432,20.9 L1440,24 L1440,44 L0,44 Z"/></svg>
+<section class="band tinted" id="testimonials">
+  <div class="inner reveal">
+    <p class="eyebrow">What families say</p>
+    <h2 class="sec">Kind words from our families.</h2>
+    <div class="quotes">
+      <figure class="tq"><blockquote>This day-care has made such a positive difference in my son’s life and by extension, our whole family’s wellbeing. From 6 months old to now 2.5 years, my son has grown into a caring, articulate, sociable, and well-behaved little boy. This is largely because of the meaningful interactions and relationships he has built with all of the carers and other children. I never take for granted how lucky we are to have this day-care in Altona and that we are a part of it. Thank you so much!</blockquote><figcaption><span class="tq-av" style="background:var(--teal)" aria-hidden="true">M</span><span>Monica<small>AEEC parent</small></span></figcaption></figure><figure class="tq"><blockquote>Our kids have attended the centre since its opening and couldn’t be happier. We love the fact that it’s an independent family owned centre. You can tell that they really care about providing service excellence in all areas and most of all wanting to make it a happy experience for all. We also love all the extras they do to celebrate special occasions such as Christmas, Kinda Graduation etc. We certainly give the service a gold star.</blockquote><figcaption><span class="tq-av" style="background:var(--gold-deep)" aria-hidden="true">L</span><span>Louise<small>AEEC parent</small></span></figcaption></figure><figure class="tq"><blockquote>We love Altona Early Education Centre, and so does our three-year-old son who has been attending for 18 months. The staff are amazing, and we feel so comfortable leaving our child in their care. It’s a warm and nurturing environment for children to feel safe and thrive.</blockquote><figcaption><span class="tq-av" style="background:var(--coral)" aria-hidden="true">C</span><span>Chelsea<small>AEEC parent</small></span></figcaption></figure>
+    </div>
+    <div style="text-align:center;margin-top:34px"><a class="btn solid" href="testimonials/">Read all 9 family stories →</a></div>
+  </div>
+</section>
+<svg class="wave to-bg" viewBox="0 0 1440 44" preserveAspectRatio="none" aria-hidden="true" style="background:var(--tint)"><path class="rip" d="M0,10.6 L52,9.0 L82,8.4 L125,20.0 L185,10.4 L214,14.3 L271,13.2 L335,10.1 L388,8.4 L430,19.1 L475,15.3 L533,21.4 L585,18.6 L629,8.6 L661,13.2 L713,8.7 L744,12.4 L777,15.0 L838,21.4 L875,16.7 L937,22.1 L996,18.2 L1033,22.1 L1090,18.7 L1146,11.6 L1196,20.7 L1251,9.2 L1285,15.5 L1333,18.2 L1392,15.1 L1432,11.9 L1440,15 L1440,44 L0,44 Z"/><path d="M0,19.6 L52,18.0 L82,17.4 L125,29.0 L185,19.4 L214,23.3 L271,22.2 L335,19.1 L388,17.4 L430,28.1 L475,24.3 L533,30.4 L585,27.6 L629,17.6 L661,22.2 L713,17.7 L744,21.4 L777,24.0 L838,30.4 L875,25.7 L937,31.1 L996,27.2 L1033,31.1 L1090,27.7 L1146,20.6 L1196,29.7 L1251,18.2 L1285,24.5 L1333,27.2 L1392,24.1 L1432,20.9 L1440,24 L1440,44 L0,44 Z"/></svg>
 <!-- ================= FAQ ================= -->
 <section class="band" id="faq">
   <div class="inner reveal">

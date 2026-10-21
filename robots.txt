@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://itaeec.github.io/AEEC/sitemap.xml
+Sitemap: https://www.altonaearlyeducation.com.au/sitemap.xml

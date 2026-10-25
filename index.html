@@ -352,7 +352,8 @@
     border-radius: 22px;
     border: 5px solid var(--card); /* pasted-photo white frame */
     box-shadow: 0 28px 64px -22px rgba(20, 80, 78, 0.38);
-    will-change: width, height, border-radius;
+    /* sized to the viewport once; JS scales it with a transform (no layout per frame) */
+    will-change: transform;
   }
   .xmedia img {
     position: absolute;
@@ -372,7 +373,11 @@
     z-index: 4;
     pointer-events: none;
     filter: drop-shadow(0 26px 22px rgba(24, 84, 80, 0.38));
-    will-change: width, top;
+    will-change: transform;
+  }
+  @media (max-width: 860px) {
+    /* phones: a lighter shadow blur — it is re-rendered every frame while Tommy bobs */
+    .xpop { filter: drop-shadow(0 14px 10px rgba(24, 84, 80, 0.34)); }
   }
   .xpop img {
     display: block;
@@ -1374,32 +1379,56 @@
   function lerp(a, b, t) { return a + (b - a) * t; }
 
   if (!reduceMotion) {
-    var vh = window.innerHeight;
-    var bgScale = 1.02; // written by applyX, read by the parallax loop
-    window.addEventListener("resize", function () { vh = window.innerHeight; applyX(); });
+    var vh = window.innerHeight, vw = window.innerWidth;
+    var touch = window.matchMedia("(hover: none)").matches;
+    // Everything below animates with transforms only. Changing width/height/top
+    // per frame forced phones to re-layout and repaint the big images on every
+    // scroll step, which made the opener choppy.
+    var w0, h0, popW0, bgScale = 1.02, sx = 1, sy = 1;
+    var eX = 0, eY = 0; // eased pointer offsets (desktop parallax)
+    function layoutX() {
+      vh = window.innerHeight; vw = window.innerWidth;
+      w0 = Math.min(vw * 0.84, 920);
+      h0 = Math.min(vh * 0.46, w0 * 9 / 16);   // big 16:9 card, room for the title above
+      popW0 = w0 * 1.3;
+      xmedia.style.width = vw + "px";
+      xmedia.style.height = vh + "px";
+      xmedia.style.top = "50%";
+      xpop.style.width = popW0 + "px";
+      xpop.style.top = "50%";
+      applyX();
+    }
+    function writeImg() {
+      ximg.style.transform =
+        "translate(calc(-50% + " + (-eX * 12) + "px), calc(-50% + " + (-eY * 9) + "px)) scale(" +
+        (bgScale / sx) + ", " + (bgScale / sy) + ")";
+    }
+    window.addEventListener("resize", layoutX);
 
     function applyX() {
       var span = expander.offsetHeight - vh;
       var pRaw = span > 0 ? Math.min(1, Math.max(0, window.scrollY / span)) : 1;
       var p = easeInOutCubic(pRaw);
 
-      var vw = window.innerWidth;
-      var w0 = Math.min(vw * 0.84, 920);
-      var h0 = Math.min(vh * 0.46, w0 * 9 / 16);   // big 16:9 card, room for the title above
-      var curW = lerp(w0, vw, p);
+      var curW = lerp(w0, vw, p), curH = lerp(h0, vh, p);
+      sx = curW / vw; sy = curH / vh;
       var topPct = lerp(58, 50, p);
-      xmedia.style.width = curW + "px";
-      xmedia.style.height = lerp(h0, vh, p) + "px";
-      xmedia.style.borderRadius = lerp(22, 0, p) + "px";
-      xmedia.style.borderWidth = lerp(5, 0, p) + "px";
-      xmedia.style.top = topPct + "%";
+      var dy = (topPct - 50) / 100 * vh;
+      xmedia.style.transform = "translate(-50%, calc(-50% + " + dy + "px)) scale(" + sx + ", " + sy + ")";
+      // radius/border are in the card's unscaled space, so divide by the scale to
+      // keep the visual size; rounded so the clip mask isn't rebuilt every frame
+      var r = lerp(22, 0, p), b = lerp(5, 0, p);
+      xmedia.style.borderRadius = Math.round(r / sx) + "px / " + Math.round(r / sy) + "px";
+      xmedia.style.borderWidth = (Math.round(b / sy * 2) / 2) + "px " + (Math.round(b / sx * 2) / 2) + "px";
+      bgScale = lerp(1.02, 1.0, p);
+      writeImg();
 
       // pop-out turtle layer rides the frame, slightly larger and lifted,
       // then settles back into the photo as it reaches fullscreen
       // turtle keeps a little pop even at fullscreen (background has no turtle)
-      xpop.style.width = (curW * lerp(1.3, 0.86, p)) + "px";
-      xpop.style.top = (topPct - lerp(3.4, 0, p)) + "%";
-      bgScale = lerp(1.02, 1.0, p); // parallax loop owns ximg's transform
+      var popS = (curW * lerp(1.3, 0.86, p)) / popW0;
+      var popDy = (topPct - lerp(3.4, 0, p) - 50) / 100 * vh;
+      xpop.style.transform = "translate(-50%, calc(-50% + " + popDy + "px)) scale(" + popS + ")";
 
       var shift = p * 55;
       xl.style.transform = "translateX(" + (-shift) + "vw)";
@@ -1419,35 +1448,36 @@
       xTick = true;
       requestAnimationFrame(function () { applyX(); xTick = false; });
     }, { passive: true });
-    applyX();
+    layoutX();
 
-    // ---- mouse parallax on the diorama layers ----
+    // ---- mouse parallax on the diorama layers (pointer devices only) ----
     // turtle (front) follows the cursor, background drifts the opposite way,
     // seaweed cutouts sit in between. Eased in a rAF loop; margins are used so
     // the CSS/scroll transforms are never clobbered.
-    var seaweeds = document.querySelectorAll(".seaweed");
-    var tX = 0, tY = 0, eX = 0, eY = 0;
-    window.addEventListener("pointermove", function (e) {
-      tX = (e.clientX / window.innerWidth - 0.5) * 2;
-      tY = (e.clientY / window.innerHeight - 0.5) * 2;
-    }, { passive: true });
+    if (!touch) {
+      var seaweeds = document.querySelectorAll(".seaweed");
+      var tX = 0, tY = 0;
+      window.addEventListener("pointermove", function (e) {
+        tX = (e.clientX / window.innerWidth - 0.5) * 2;
+        tY = (e.clientY / window.innerHeight - 0.5) * 2;
+      }, { passive: true });
 
-    (function parallaxLoop() {
-      // only spend effort while the diorama is on screen
-      if (window.scrollY < expander.offsetHeight) {
-        eX += (tX - eX) * 0.06;
-        eY += (tY - eY) * 0.06;
-        ximg.style.transform =
-          "translate(calc(-50% + " + (-eX * 12) + "px), calc(-50% + " + (-eY * 9) + "px)) scale(" + bgScale + ")";
-        xpop.style.marginLeft = (eX * 26) + "px";
-        xpop.style.marginTop = (eY * 18) + "px";
-        for (var i = 0; i < seaweeds.length; i++) {
-          seaweeds[i].style.marginLeft = (eX * (7 + i * 3)) + "px";
-          seaweeds[i].style.marginTop = (eY * (5 + i * 2)) + "px";
+      (function parallaxLoop() {
+        // only spend effort while the diorama is on screen
+        if (window.scrollY < expander.offsetHeight) {
+          eX += (tX - eX) * 0.06;
+          eY += (tY - eY) * 0.06;
+          writeImg();
+          xpop.style.marginLeft = (eX * 26) + "px";
+          xpop.style.marginTop = (eY * 18) + "px";
+          for (var i = 0; i < seaweeds.length; i++) {
+            seaweeds[i].style.marginLeft = (eX * (7 + i * 3)) + "px";
+            seaweeds[i].style.marginTop = (eY * (5 + i * 2)) + "px";
+          }
         }
-      }
-      requestAnimationFrame(parallaxLoop);
-    })();
+        requestAnimationFrame(parallaxLoop);
+      })();
+    }
   } else {
     xcap.classList.add("show");
   }
